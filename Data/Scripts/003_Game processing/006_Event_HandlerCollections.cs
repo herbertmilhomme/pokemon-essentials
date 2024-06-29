@@ -40,30 +40,30 @@
 #   :on_wild_battle_end - After a wild battle. Updates Poké Radar chain info.
 #===============================================================================
 module EventHandlers
-  @@events = {}
+	@@events = {}
 
-  module_function
+	module_function
 
-  # Add a named callback for the given event.
-  def add(event, key, proc)
-    @@events[event] = NamedEvent.new if !@@events.has_key?(event)
-    @@events[event].add(key, proc)
-  end
+	# Add a named callback for the given event.
+	def add(event, key, proc)
+		@@events[event] = NamedEvent.new if !@@events.has_key?(event)
+		@@events[event].add(key, proc)
+	end
 
-  # Remove a named callback from the given event.
-  def remove(event, key)
-    @@events[event]&.remove(key)
-  end
+	# Remove a named callback from the given event.
+	def remove(event, key)
+		@@events[event]&.remove(key)
+	end
 
-  # Clear all callbacks for the given event.
-  def clear(key)
-    @@events[key]&.clear
-  end
+	# Clear all callbacks for the given event.
+	def clear(key)
+		@@events[key]&.clear
+	end
 
-  # Trigger all callbacks from an Event if it has been defined.
-  def trigger(event, *args)
-    return @@events[event]&.trigger(*args)
-  end
+	# Trigger all callbacks from an Event if it has been defined.
+	def trigger(event, *args)
+		return @@events[event]&.trigger(*args)
+	end
 end
 
 #===============================================================================
@@ -80,48 +80,48 @@ end
 # Various debug menus (main, Pokémon, battle, battle Pokémon)
 #===============================================================================
 module MenuHandlers
-  @@handlers = {}
+	@@handlers = {}
 
-  module_function
+	module_function
 
-  def add(menu, option, hash)
-    @@handlers[menu] = HandlerHash.new if !@@handlers.has_key?(menu)
-    @@handlers[menu].add(option, hash)
-  end
+	def add(menu, option, hash)
+		@@handlers[menu] = HandlerHash.new if !@@handlers.has_key?(menu)
+		@@handlers[menu].add(option, hash)
+	end
 
-  def remove(menu, option)
-    @@handlers[menu]&.remove(option)
-  end
+	def remove(menu, option)
+		@@handlers[menu]&.remove(option)
+	end
 
-  def clear(menu)
-    @@handlers[menu]&.clear
-  end
+	def clear(menu)
+		@@handlers[menu]&.clear
+	end
 
-  def each(menu)
-    return if !@@handlers.has_key?(menu)
-    @@handlers[menu].each { |option, hash| yield option, hash }
-  end
+	def each(menu)
+		return if !@@handlers.has_key?(menu)
+		@@handlers[menu].each { |option, hash| yield option, hash }
+	end
 
-  def each_available(menu, *args)
-    return if !@@handlers.has_key?(menu)
-    options = @@handlers[menu]
-    keys = options.keys
-    sorted_keys = keys.sort_by { |option| options[option]["order"] || keys.index(option) }
-    sorted_keys.each do |option|
-      hash = options[option]
-      next if hash["condition"] && !hash["condition"].call(*args)
-      if hash["name"].is_a?(Proc)
-        name = hash["name"].call
-      else
-        name = _INTL(hash["name"])
-      end
-      yield option, hash, name
-    end
-  end
+	def each_available(menu, *args)
+		return if !@@handlers.has_key?(menu)
+		options = @@handlers[menu]
+		keys = options.keys
+		sorted_keys = keys.sort_by { |option| options[option]["order"] || keys.index(option) }
+		sorted_keys.each do |option|
+			hash = options[option]
+			next if hash["condition"] && !hash["condition"].call(*args)
+			if hash["name"].is_a?(Proc)
+				name = hash["name"].call
+			else
+				name = _INTL(hash["name"])
+			end
+			yield option, hash, name
+		end
+	end
 
-  def call(menu, option, function, *args)
-    option_hash = @@handlers[menu][option]
-    return nil if !option_hash || !option_hash[function]
-    return option_hash[function].call(*args)
-  end
+	def call(menu, option, function, *args)
+		option_hash = @@handlers[menu][option]
+		return nil if !option_hash || !option_hash[function]
+		return option_hash[function].call(*args)
+	end
 end
